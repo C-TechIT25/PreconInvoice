@@ -164,6 +164,7 @@ function removeLastSpec(i) {
 }
 
 // Print CSS
+/* Updated PRINT_CSS in your script */
 var PRINT_CSS = [
   '*{margin:0;padding:0;box-sizing:border-box}',
   'body{font-family:"DM Sans",sans-serif;font-size:10pt;background:#fff}',
@@ -194,7 +195,14 @@ var PRINT_CSS = [
   '.cust-addr{color:#555;font-size:10px}',
   '.cust-gstin{display:inline-block;margin-top:5px;background:#ffd6d6;color:#d93a39;padding:2px 7px;border-radius:3px;font-family:monospace;font-size:9px;font-weight:700}',
   '.items-wrap{padding:0 0px 10px}',
-  '.footer-three-col{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:2px solid #fe5958}',
+  /* NEW RULES TO REMOVE GAP BETWEEN TABLE AND BANK DETAILS */
+  '.items-wrap table.items { margin-bottom: 0 !important; border-bottom: none !important; }',
+  '.footer-three-col { margin-top: 0 !important; border-top: 2px solid #fe5958; }',
+  '.footer-bank, .footer-terms, .footer-totals { padding-top: 8px !important; padding-bottom: 8px !important; }',
+  '.blabel { margin-bottom: 4px !important; }',
+  '.btable td { padding: 1px 6px 1px 0 !important; }',
+  /* End of new rules */
+  '.footer-three-col{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:2px solid #fe5958;margin-top:100px}',
   '.footer-bank,.footer-terms,.footer-totals{padding:14px 16px}',
   '.footer-bank,.footer-terms{border-right:1px solid #ffd6d6}',
   '.blabel{font-size:7.5px;letter-spacing:2px;text-transform:uppercase;color:#fe5958;font-weight:700;margin-bottom:8px;display:block}',
@@ -207,11 +215,10 @@ var PRINT_CSS = [
   '.gst-rate-sel{font-size:10px;background:#ffd6d6;border:none;color:#d93a39;font-weight:600;border-radius:3px;padding:1px 4px}',
   '.total-final-row td{background:#fe5958!important;color:#fff!important;font-weight:800;font-size:13px;border:none;padding:10px}',
   '.amount-words{padding:8px 20px;background:#fff5f5;border-top:1px solid #ffd6d6;font-size:10px;font-weight:500}',
-  '.sig-strip{display:flex;justify-content:space-between;align-items:flex-end;padding:16px 24px 22px;border-top:1px solid #ffd6d6}',
-  '.seal-img-fixed{width:90px;height:90px;border-radius:50%;object-fit:contain;border:2px solid #ffd6d6;background:#fff}',
+  '.sig-strip{display:flex;justify-content:end;align-items:flex-end;padding:16px 24px 22px;border-top:1px solid #ffd6d6}',
   '.sig-area{width:200px;height:100px;border-bottom:1.5px solid #fe5958;margin:10px 0 6px;background:#fff;display:flex;align-items:center;justify-content:center}',
-  '.sig-img-fixed{max-width:100%;max-height:100%;object-fit:contain}',
-  '.sig-auth{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#fe5958;font-weight:700}',
+  '.sig-img-fixed{max-width:100$;max-height:100px;object-fit:contain}',
+  '.sig-auth{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#fe5958;font-weight:700; text-align: center;margin-top: 5px;}',
   '.red-bar{height:6px;background:#fe5958}',
   '@media print{body{margin:0;padding:0}.pp{page-break-after:always;min-height:297mm}.pp:last-child{page-break-after:auto}}'
 ].join('');
