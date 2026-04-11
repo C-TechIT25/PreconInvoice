@@ -10,17 +10,17 @@ firebase.initializeApp({
   appId: "1:420799463124:web:5f5b3d8196478e84944541"
 });
 
-var db   = firebase.firestore();
+var db = firebase.firestore();
 var auth = firebase.auth();
 
 // ============================================================
 // AUTH STATE LISTENER
 // ============================================================
-auth.onAuthStateChanged(function(user) {
+auth.onAuthStateChanged(function (user) {
   if (user) {
     // Logged in — show app
-    document.getElementById('loginPage').style.display  = 'none';
-    document.getElementById('mainApp').style.display    = 'block';
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
     // Set user display
     var displayName = user.displayName || user.email || 'User';
     document.getElementById('userName').textContent = displayName.split(' ')[0];
@@ -28,8 +28,8 @@ auth.onAuthStateChanged(function(user) {
     render();
   } else {
     // Logged out — show login
-    document.getElementById('loginPage').style.display  = 'flex';
-    document.getElementById('mainApp').style.display    = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
   }
 });
 
@@ -39,23 +39,23 @@ auth.onAuthStateChanged(function(user) {
 function switchAuthTab(tab) {
   document.getElementById('loginTab').classList.toggle('active', tab === 'login');
   document.getElementById('registerTab').classList.toggle('active', tab === 'register');
-  document.getElementById('loginForm').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
-  document.getElementById('loginError').textContent    = '';
+  document.getElementById('loginError').textContent = '';
   document.getElementById('registerError').textContent = '';
 }
 
 function doLogin() {
-  var email    = document.getElementById('loginEmail').value.trim();
+  var email = document.getElementById('loginEmail').value.trim();
   var password = document.getElementById('loginPassword').value;
-  var errEl    = document.getElementById('loginError');
-  var btn      = document.getElementById('loginBtn');
+  var errEl = document.getElementById('loginError');
+  var btn = document.getElementById('loginBtn');
   errEl.textContent = '';
   if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
   btn.textContent = 'Signing in…';
   btn.disabled = true;
   auth.signInWithEmailAndPassword(email, password)
-    .catch(function(e) {
+    .catch(function (e) {
       errEl.textContent = friendlyAuthError(e.code);
       btn.textContent = 'Sign In';
       btn.disabled = false;
@@ -63,19 +63,19 @@ function doLogin() {
 }
 
 function doRegister() {
-  var name     = document.getElementById('regName').value.trim();
-  var email    = document.getElementById('regEmail').value.trim();
+  var name = document.getElementById('regName').value.trim();
+  var email = document.getElementById('regEmail').value.trim();
   var password = document.getElementById('regPassword').value;
-  var errEl    = document.getElementById('registerError');
-  var btn      = document.getElementById('registerBtn');
+  var errEl = document.getElementById('registerError');
+  var btn = document.getElementById('registerBtn');
   errEl.textContent = '';
   if (!name || !email || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
   if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
   btn.textContent = 'Creating account…';
   btn.disabled = true;
   auth.createUserWithEmailAndPassword(email, password)
-    .then(function(cred) { return cred.user.updateProfile({ displayName: name }); })
-    .catch(function(e) {
+    .then(function (cred) { return cred.user.updateProfile({ displayName: name }); })
+    .catch(function (e) {
       errEl.textContent = friendlyAuthError(e.code);
       btn.textContent = 'Create Account';
       btn.disabled = false;
@@ -84,7 +84,7 @@ function doRegister() {
 
 function doGoogleLogin() {
   var provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(function(e) {
+  auth.signInWithPopup(provider).catch(function (e) {
     document.getElementById('loginError').textContent = friendlyAuthError(e.code);
   });
 }
@@ -96,15 +96,15 @@ function doLogout() {
 
 function friendlyAuthError(code) {
   var map = {
-    'auth/invalid-email':          'Invalid email address.',
-    'auth/user-not-found':         'No account found with this email.',
-    'auth/wrong-password':         'Incorrect password.',
-    'auth/email-already-in-use':   'Email already in use.',
-    'auth/weak-password':          'Password is too weak.',
-    'auth/too-many-requests':      'Too many attempts. Try again later.',
+    'auth/invalid-email': 'Invalid email address.',
+    'auth/user-not-found': 'No account found with this email.',
+    'auth/wrong-password': 'Incorrect password.',
+    'auth/email-already-in-use': 'Email already in use.',
+    'auth/weak-password': 'Password is too weak.',
+    'auth/too-many-requests': 'Too many attempts. Try again later.',
     'auth/network-request-failed': 'Network error. Check your connection.',
-    'auth/popup-closed-by-user':   'Sign-in window was closed.',
-    'auth/invalid-credential':     'Invalid email or password.'
+    'auth/popup-closed-by-user': 'Sign-in window was closed.',
+    'auth/invalid-credential': 'Invalid email or password.'
   };
   return map[code] || 'An error occurred. Please try again.';
 }
@@ -118,7 +118,7 @@ function toast(msg, color) {
   t.textContent = msg;
   t.style.borderLeftColor = color;
   t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2800);
+  setTimeout(function () { t.classList.remove('show'); }, 2800);
 }
 
 function fmt(n) {
@@ -168,9 +168,9 @@ function render() {
   var tb = document.getElementById('itemsBody');
   if (!tb) return;
   tb.innerHTML = '';
-  items.forEach(function(item, i) {
+  items.forEach(function (item, i) {
     var amt = item.qty * item.price;
-    var specsHtml = item.specs.map(function(s, si) {
+    var specsHtml = item.specs.map(function (s, si) {
       return '<div class="spec-line">' +
         '<span class="spec-key" contenteditable="true" data-i="' + i + '" data-si="' + si + '" data-f="k">' + esc(s.k) + '</span>' +
         ' : <span contenteditable="true" data-i="' + i + '" data-si="' + si + '" data-f="v">' + esc(s.v) + '</span>' +
@@ -193,8 +193,8 @@ function render() {
       '<td style="text-align:right;font-weight:700;color:var(--red-d);vertical-align:top">₹ ' + fmt(amt) + '</td>';
     tb.appendChild(tr);
   });
-  tb.querySelectorAll('input[data-i]').forEach(function(el) {
-    el.addEventListener('input', function() {
+  tb.querySelectorAll('input[data-i]').forEach(function (el) {
+    el.addEventListener('input', function () {
       var i = +el.dataset.i, f = el.dataset.f;
       if (f === 'qty' || f === 'price') items[i][f] = parseFloat(el.value) || 0;
       else items[i][f] = el.value;
@@ -203,8 +203,8 @@ function render() {
       if (row) row.cells[5].innerHTML = '₹ ' + fmt(items[i].qty * items[i].price);
     });
   });
-  tb.querySelectorAll('[data-si]').forEach(function(el) {
-    el.addEventListener('input', function() {
+  tb.querySelectorAll('[data-si]').forEach(function (el) {
+    el.addEventListener('input', function () {
       items[+el.dataset.i].specs[+el.dataset.si][el.dataset.f] = el.innerText.trim();
     });
   });
@@ -213,12 +213,12 @@ function render() {
 
 function recalc() {
   var sub = 0;
-  items.forEach(function(it) { sub += it.qty * it.price; });
+  items.forEach(function (it) { sub += it.qty * it.price; });
   var sg = parseFloat(document.getElementById('sgstRate').value) || 0;
   var cg = parseFloat(document.getElementById('cgstRate').value) || 0;
-  document.getElementById('subTotal').innerHTML   = '₹ ' + fmt(sub);
-  document.getElementById('sgstAmt').innerHTML    = '₹ ' + fmt(sub * sg / 100);
-  document.getElementById('cgstAmt').innerHTML    = '₹ ' + fmt(sub * cg / 100);
+  document.getElementById('subTotal').innerHTML = '₹ ' + fmt(sub);
+  document.getElementById('sgstAmt').innerHTML = '₹ ' + fmt(sub * sg / 100);
+  document.getElementById('cgstAmt').innerHTML = '₹ ' + fmt(sub * cg / 100);
   document.getElementById('grandTotal').innerHTML = '₹ ' + fmt(sub + sub * sg / 100 + sub * cg / 100);
   document.getElementById('amountWords').innerHTML = numWords(Math.round(sub + sub * sg / 100 + sub * cg / 100));
 }
@@ -228,10 +228,10 @@ function numWords(n) {
   var a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
   var b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
   function w(x) {
-    if (x < 20)       return a[x];
-    if (x < 100)      return b[Math.floor(x / 10)] + (x % 10 ? ' ' + a[x % 10] : '');
-    if (x < 1000)     return a[Math.floor(x / 100)] + ' Hundred' + (x % 100 ? ' ' + w(x % 100) : '');
-    if (x < 100000)   return w(Math.floor(x / 1000)) + ' Thousand' + (x % 1000 ? ' ' + w(x % 1000) : '');
+    if (x < 20) return a[x];
+    if (x < 100) return b[Math.floor(x / 10)] + (x % 10 ? ' ' + a[x % 10] : '');
+    if (x < 1000) return a[Math.floor(x / 100)] + ' Hundred' + (x % 100 ? ' ' + w(x % 100) : '');
+    if (x < 100000) return w(Math.floor(x / 1000)) + ' Thousand' + (x % 1000 ? ' ' + w(x % 1000) : '');
     if (x < 10000000) return w(Math.floor(x / 100000)) + ' Lakh' + (x % 100000 ? ' ' + w(x % 100000) : '');
     return w(Math.floor(x / 10000000)) + ' Crore' + (x % 10000000 ? ' ' + w(x % 10000000) : '');
   }
@@ -290,6 +290,7 @@ var PRINT_CSS = [
   '.cust-addr{color:#555;font-size:10px}',
   '.cust-gstin{display:inline-block;margin-top:5px;background:#ffd6d6;color:#d93a39;padding:2px 7px;border-radius:3px;font-family:monospace;font-size:9px;font-weight:700}',
   '.items-wrap{padding:0 0px 10px}',
+  '.detail-items-table tbody td{  padding: 10px 12px; border-bottom: 1px solid #f1f5f9;vertical-align: top;}',
   '.items-wrap table.items{margin-bottom:0!important;border-bottom:none!important}',
   '.footer-three-col{margin-top:0!important;border-top:2px solid #fe5958}',
   '.footer-bank,.footer-terms,.footer-totals{padding-top:8px!important;padding-bottom:8px!important}',
@@ -306,10 +307,10 @@ var PRINT_CSS = [
   '.total-final-row td{background:#fe5958!important;color:#fff!important;font-weight:800;font-size:13px;border:none;padding:10px}',
   '.amount-words{padding:8px 20px;background:#fff5f5;border-top:1px solid #ffd6d6;font-size:10px;font-weight:500}',
   '.sig-strip{display:flex;justify-content:space-between;align-items:flex-end;padding:16px 24px 22px;border-top:1px solid #ffd6d6}',
-  
+
   '.sig-area{width:200px;height:100px;border-bottom:1.5px solid #fe5958;margin:10px 0 6px;background:#fff;display:flex;align-items:center;justify-content:center}',
   '.sig-img-fixed{max-width:100%;max-height:100px;object-fit:contain}',
-    '.seal-img-fixed{max-width:100%;max-height:100px;object-fit:contain}',
+  '.seal-img-fixed{max-width:100%;max-height:100px;object-fit:contain}',
 
   '.sig-auth{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#fe5958;font-weight:700;text-align:center;margin-top:5px}',
   '.red-bar{height:6px;background:#fe5958}',
@@ -327,8 +328,8 @@ var TH = '<table style="width:100%;border-collapse:collapse;">' +
   '</tr></thead><tbody>';
 
 function buildItemRows() {
-  return items.map(function(item, idx) {
-    var specsHtml = item.specs.map(function(s) {
+  return items.map(function (item, idx) {
+    var specsHtml = item.specs.map(function (s) {
       return '<div style="display:flex;gap:6px;font-size:9px;margin:2px 0">' +
         '<span style="color:#d93a39;font-weight:600;min-width:80px">' + esc(s.k) + '</span>' +
         ' : <span>' + esc(s.v) + '</span></div>';
@@ -354,7 +355,7 @@ function getHeaderHtml() {
 
 function getFooterHtml() {
   var sub = 0;
-  items.forEach(function(it) { sub += it.qty * it.price; });
+  items.forEach(function (it) { sub += it.qty * it.price; });
   var sg = parseFloat(document.getElementById('sgstRate').value) || 0;
   var cg = parseFloat(document.getElementById('cgstRate').value) || 0;
   var grand = sub + sub * sg / 100 + sub * cg / 100;
@@ -404,7 +405,7 @@ function printMultiPageInvoice() {
   pw.document.write('</body></html>');
   pw.document.close();
   pw.focus();
-  setTimeout(function() { pw.print(); }, 700);
+  setTimeout(function () { pw.print(); }, 700);
 }
 
 // ============================================================
@@ -412,32 +413,32 @@ function printMultiPageInvoice() {
 // ============================================================
 function collectData() {
   var sub = 0;
-  items.forEach(function(it) { sub += it.qty * it.price; });
+  items.forEach(function (it) { sub += it.qty * it.price; });
   var sg = parseFloat(document.getElementById('sgstRate').value) || 0;
   var cg = parseFloat(document.getElementById('cgstRate').value) || 0;
   return {
-    invoiceNo:  document.getElementById('invNo').innerText.trim(),
+    invoiceNo: document.getElementById('invNo').innerText.trim(),
     invoiceDate: document.getElementById('invDate').innerText.trim(),
-    buyerRef:   document.getElementById('buyerRef').innerText.trim(),
-    otherRef:   document.getElementById('otherRef').innerText.trim(),
+    buyerRef: document.getElementById('buyerRef').innerText.trim(),
+    otherRef: document.getElementById('otherRef').innerText.trim(),
     supplyState: document.getElementById('supplyState').innerText.trim(),
     customer: {
-      name:    document.getElementById('custName').innerText.trim(),
+      name: document.getElementById('custName').innerText.trim(),
       address: document.getElementById('custAddr').innerText.trim(),
-      gstin:   document.getElementById('custGst').innerText.trim()
+      gstin: document.getElementById('custGst').innerText.trim()
     },
     shipTo: {
-      name:    document.getElementById('shipName').innerText.trim(),
+      name: document.getElementById('shipName').innerText.trim(),
       address: document.getElementById('shipAddr').innerText.trim(),
-      phone:   document.getElementById('shipPhone').innerText.trim()
+      phone: document.getElementById('shipPhone').innerText.trim()
     },
-    items: items.map(function(it) {
+    items: items.map(function (it) {
       return { name: it.name, specs: it.specs, qty: it.qty, unit: it.unit, price: it.price, amount: it.qty * it.price };
     }),
     sgstRate: sg, cgstRate: cg,
     subTotal: sub,
-    sgstAmt:  sub * sg / 100,
-    cgstAmt:  sub * cg / 100,
+    sgstAmt: sub * sg / 100,
+    cgstAmt: sub * cg / 100,
     grandTotal: sub + sub * sg / 100 + sub * cg / 100,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     createdBy: auth.currentUser ? auth.currentUser.uid : null
@@ -449,12 +450,12 @@ function saveToFirestore() {
   btn.textContent = 'Saving…';
   btn.disabled = true;
   db.collection('invoices').add(collectData())
-    .then(function(r) {
+    .then(function (r) {
       toast('✅ Saved! ID: ' + r.id.slice(0, 8));
       btn.textContent = '💾 Save to Firestore';
       btn.disabled = false;
     })
-    .catch(function(e) {
+    .catch(function (e) {
       toast('❌ ' + e.message, '#ef4444');
       btn.textContent = '💾 Save to Firestore';
       btn.disabled = false;
@@ -471,7 +472,7 @@ function loadInvoices() {
   tbody.innerHTML = '<tr><td colspan="8" style="padding:40px;text-align:center;color:#94a3b8"><div style="display:inline-block;animation:spin 1s linear infinite;font-size:28px">⏳</div><br><span style="font-size:13px;margin-top:8px;display:block">Loading invoices…</span></td></tr>';
 
   db.collection('invoices').orderBy('createdAt', 'desc').get()
-    .then(function(snap) {
+    .then(function (snap) {
       if (snap.empty) {
         tbody.innerHTML = '<tr><td colspan="8" style="padding:50px;text-align:center;color:#94a3b8">' +
           '<div style="font-size:3rem;margin-bottom:12px">📋</div>' +
@@ -482,7 +483,7 @@ function loadInvoices() {
       }
       tbody.innerHTML = '';
       var idx = 0;
-      snap.forEach(function(ds) {
+      snap.forEach(function (ds) {
         idx++;
         var d = ds.data(), id = ds.id;
         var tr = document.createElement('tr');
@@ -513,7 +514,7 @@ function loadInvoices() {
         tbody.appendChild(tr);
       });
     })
-    .catch(function(e) {
+    .catch(function (e) {
       tbody.innerHTML = '<tr><td colspan="8" style="padding:24px;color:#ef4444">Error: ' + esc(e.message) + '</td></tr>';
     });
 }
@@ -530,7 +531,7 @@ function toggleMenu(id, e) {
   activeMenu = menu.classList.contains('show') ? menu : null;
 }
 
-document.addEventListener('click', function() {
+document.addEventListener('click', function () {
   if (activeMenu) { activeMenu.classList.remove('show'); activeMenu = null; }
 });
 
@@ -540,20 +541,20 @@ document.addEventListener('click', function() {
 function openModal(id) {
   var el = document.getElementById(id);
   el.style.display = 'flex';
-  setTimeout(function() { el.classList.add('show'); }, 10);
+  setTimeout(function () { el.classList.add('show'); }, 10);
   if (activeMenu) { activeMenu.classList.remove('show'); activeMenu = null; }
 }
 
 function closeModal(id) {
   var el = document.getElementById(id);
   el.classList.remove('show');
-  setTimeout(function() { el.style.display = 'none'; }, 200);
+  setTimeout(function () { el.style.display = 'none'; }, 200);
 }
 
 // Close modals clicking backdrop
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
-    overlay.addEventListener('click', function(e) {
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+    overlay.addEventListener('click', function (e) {
       if (e.target === overlay) closeModal(overlay.id);
     });
   });
@@ -563,7 +564,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // VIEW DETAILS MODAL
 // ============================================================
 function viewInvoiceDetail(id) {
-  db.collection('invoices').doc(id).get().then(function(ds) {
+  db.collection('invoices').doc(id).get().then(function (ds) {
     if (!ds.exists) return;
     var d = ds.data();
     var body = document.getElementById('detailModalBody');
@@ -605,8 +606,8 @@ function buildDetailHtml(d) {
     '</div>';
 
   // Items table
-  var itemRows = (d.items || []).map(function(it, i) {
-    var specsHtml = (it.specs || []).map(function(s) {
+  var itemRows = (d.items || []).map(function (it, i) {
+    var specsHtml = (it.specs || []).map(function (s) {
       return '<div style="display:flex;gap:4px;font-size:10px;color:#64748b"><span style="color:#d93a39;font-weight:600;min-width:70px">' + esc(s.k) + '</span>: <span>' + esc(s.v) + '</span></div>';
     }).join('');
     return '<tr>' +
@@ -649,7 +650,7 @@ function viewInvoicePdf(id) {
   ];
   // Reset
   bar.style.width = '0%';
-  steps.forEach(function(s) {
+  steps.forEach(function (s) {
     var el = document.getElementById(s.id);
     el.className = 'gen-step';
     if (s.id === 'gs1') el.classList.add('active');
@@ -658,23 +659,23 @@ function viewInvoicePdf(id) {
   // Fetch data in parallel
   var dataPromise = db.collection('invoices').doc(id).get();
 
-  steps.forEach(function(s, idx) {
-    setTimeout(function() {
+  steps.forEach(function (s, idx) {
+    setTimeout(function () {
       bar.style.width = s.pct + '%';
       if (idx > 0) document.getElementById(steps[idx - 1].id).className = 'gen-step done';
       document.getElementById(s.id).className = 'gen-step active';
     }, s.delay);
   });
 
-  setTimeout(function() {
+  setTimeout(function () {
     document.getElementById('gs4').className = 'gen-step done';
-    dataPromise.then(function(ds) {
+    dataPromise.then(function (ds) {
       if (!ds.exists) { closeModal('invoiceGenModal'); toast('❌ Invoice not found', '#ef4444'); return; }
-      setTimeout(function() {
+      setTimeout(function () {
         closeModal('invoiceGenModal');
         printStaticInvoice(ds.data());
       }, 300);
-    }).catch(function(e) {
+    }).catch(function (e) {
       closeModal('invoiceGenModal');
       toast('❌ ' + e.message, '#ef4444');
     });
@@ -700,7 +701,7 @@ function confirmDelete() {
   btn.textContent = 'Deleting…';
   btn.disabled = true;
   db.collection('invoices').doc(pendingDeleteId).delete()
-    .then(function() {
+    .then(function () {
       closeModal('deleteModal');
       toast('🗑️ Invoice deleted successfully');
       loadInvoices();
@@ -708,7 +709,7 @@ function confirmDelete() {
       btn.textContent = '🗑️ Yes, Delete';
       btn.disabled = false;
     })
-    .catch(function(e) {
+    .catch(function (e) {
       toast('❌ ' + e.message, '#ef4444');
       btn.textContent = '🗑️ Yes, Delete';
       btn.disabled = false;
@@ -724,26 +725,26 @@ var editItems = [];
 function openEditModal(id) {
   if (activeMenu) { activeMenu.classList.remove('show'); activeMenu = null; }
   editingId = id;
-  db.collection('invoices').doc(id).get().then(function(ds) {
+  db.collection('invoices').doc(id).get().then(function (ds) {
     if (!ds.exists) { toast('❌ Invoice not found', '#ef4444'); return; }
     var d = ds.data();
     // Populate fields
-    document.getElementById('eInvNo').value      = d.invoiceNo || '';
-    document.getElementById('eInvDate').value    = d.invoiceDate || '';
-    document.getElementById('eBuyerRef').value   = d.buyerRef || '';
-    document.getElementById('eOtherRef').value   = d.otherRef || '';
+    document.getElementById('eInvNo').value = d.invoiceNo || '';
+    document.getElementById('eInvDate').value = d.invoiceDate || '';
+    document.getElementById('eBuyerRef').value = d.buyerRef || '';
+    document.getElementById('eOtherRef').value = d.otherRef || '';
     document.getElementById('eSupplyState').value = d.supplyState || '';
-    document.getElementById('eCustName').value   = (d.customer && d.customer.name)    || '';
-    document.getElementById('eCustAddr').value   = (d.customer && d.customer.address) || '';
-    document.getElementById('eCustGst').value    = (d.customer && d.customer.gstin)   || '';
-    document.getElementById('eShipName').value   = (d.shipTo && d.shipTo.name)    || '';
-    document.getElementById('eShipAddr').value   = (d.shipTo && d.shipTo.address) || '';
-    document.getElementById('eShipPhone').value  = (d.shipTo && d.shipTo.phone)   || '';
+    document.getElementById('eCustName').value = (d.customer && d.customer.name) || '';
+    document.getElementById('eCustAddr').value = (d.customer && d.customer.address) || '';
+    document.getElementById('eCustGst').value = (d.customer && d.customer.gstin) || '';
+    document.getElementById('eShipName').value = (d.shipTo && d.shipTo.name) || '';
+    document.getElementById('eShipAddr').value = (d.shipTo && d.shipTo.address) || '';
+    document.getElementById('eShipPhone').value = (d.shipTo && d.shipTo.phone) || '';
     // Tax rates
     setSelectValue('eSgstRate', d.sgstRate);
     setSelectValue('eCgstRate', d.cgstRate);
     // Items
-    editItems = (d.items || []).map(function(it) {
+    editItems = (d.items || []).map(function (it) {
       return { name: it.name, specs: it.specs || [], qty: it.qty, unit: it.unit, price: it.price };
     });
     renderEditItems();
@@ -763,7 +764,7 @@ function setSelectValue(id, val) {
 
 function renderEditItems() {
   var container = document.getElementById('editItemsContainer');
-  container.innerHTML = editItems.map(function(it, i) {
+  container.innerHTML = editItems.map(function (it, i) {
     return '<div class="edit-item-row" id="edit-item-' + i + '">' +
       '<div class="edit-item-header">' +
       '<div class="edit-item-num">' + (i + 1) + '</div>' +
@@ -799,26 +800,26 @@ function saveEditedInvoice() {
 
   var sg = parseFloat(document.getElementById('eSgstRate').value) || 0;
   var cg = parseFloat(document.getElementById('eCgstRate').value) || 0;
-  var sub = editItems.reduce(function(acc, it) { return acc + (it.qty * it.price); }, 0);
+  var sub = editItems.reduce(function (acc, it) { return acc + (it.qty * it.price); }, 0);
   var grand = sub + sub * sg / 100 + sub * cg / 100;
 
   var data = {
-    invoiceNo:   document.getElementById('eInvNo').value.trim(),
+    invoiceNo: document.getElementById('eInvNo').value.trim(),
     invoiceDate: document.getElementById('eInvDate').value.trim(),
-    buyerRef:    document.getElementById('eBuyerRef').value.trim(),
-    otherRef:    document.getElementById('eOtherRef').value.trim(),
+    buyerRef: document.getElementById('eBuyerRef').value.trim(),
+    otherRef: document.getElementById('eOtherRef').value.trim(),
     supplyState: document.getElementById('eSupplyState').value.trim(),
     customer: {
-      name:    document.getElementById('eCustName').value.trim(),
+      name: document.getElementById('eCustName').value.trim(),
       address: document.getElementById('eCustAddr').value.trim(),
-      gstin:   document.getElementById('eCustGst').value.trim()
+      gstin: document.getElementById('eCustGst').value.trim()
     },
     shipTo: {
-      name:    document.getElementById('eShipName').value.trim(),
+      name: document.getElementById('eShipName').value.trim(),
       address: document.getElementById('eShipAddr').value.trim(),
-      phone:   document.getElementById('eShipPhone').value.trim()
+      phone: document.getElementById('eShipPhone').value.trim()
     },
-    items: editItems.map(function(it) {
+    items: editItems.map(function (it) {
       return { name: it.name, specs: it.specs || [], qty: it.qty, unit: it.unit, price: it.price, amount: it.qty * it.price };
     }),
     sgstRate: sg, cgstRate: cg,
@@ -828,14 +829,14 @@ function saveEditedInvoice() {
   };
 
   db.collection('invoices').doc(editingId).update(data)
-    .then(function() {
+    .then(function () {
       toast('✅ Invoice updated successfully!');
       closeModal('editModal');
       loadInvoices();
       btn.textContent = '💾 Save Changes';
       btn.disabled = false;
     })
-    .catch(function(e) {
+    .catch(function (e) {
       toast('❌ ' + e.message, '#ef4444');
       btn.textContent = '💾 Save Changes';
       btn.disabled = false;
@@ -846,8 +847,8 @@ function saveEditedInvoice() {
 // STATIC INVOICE PRINT (from Firestore data)
 // ============================================================
 function renderStaticInvoice(d) {
-  var itemsHtml = (d.items || []).map(function(it, i) {
-    var specsHtml = (it.specs || []).map(function(s) {
+  var itemsHtml = (d.items || []).map(function (it, i) {
+    var specsHtml = (it.specs || []).map(function (s) {
       return '<div class="spec-line"><span class="spec-key">' + esc(s.k) + '</span> : <span>' + esc(s.v) + '</span></div>';
     }).join('');
     return '<tr style="border-bottom:1px solid #ffd6d6">' +
@@ -887,8 +888,8 @@ function renderStaticInvoice(d) {
 }
 
 function printStaticInvoice(d) {
-  var rowsArr = (d.items || []).map(function(item, idx) {
-    var specsHtml = (item.specs || []).map(function(s) {
+  var rowsArr = (d.items || []).map(function (item, idx) {
+    var specsHtml = (item.specs || []).map(function (s) {
       return '<div style="display:flex;gap:6px;font-size:9px;margin:2px 0">' +
         '<span style="color:#d93a39;font-weight:600;min-width:80px">' + esc(s.k) + '</span> : <span>' + esc(s.v) + '</span></div>';
     }).join('');
@@ -909,7 +910,7 @@ function printStaticInvoice(d) {
   pw.document.write('</body></html>');
   pw.document.close();
   pw.focus();
-  setTimeout(function() { pw.print(); }, 700);
+  setTimeout(function () { pw.print(); }, 700);
 }
 
 // ============================================================
