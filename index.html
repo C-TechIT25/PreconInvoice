@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>PRECON CEMENTANIOUS – Proforma Invoice</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="toast"></div>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">🏗️ PRECON</div>
+    <div class="nav-links">
+      <a href="#" class="nav-link active" onclick="showPage('createPage', this)">Create Invoice</a>
+      <a href="#" class="nav-link" onclick="showPage('viewPage', this)">View Invoices</a>
+    </div>
+  </div>
+</nav>
+
+<div id="createPage" class="page-section">
+  <div class="toolbar">
+    <div class="tb-brand">🏗️ PRECON — Proforma Invoice</div>
+    <button class="btn btn-green" id="saveBtn" onclick="saveToFirestore()">💾 Save to Firestore</button>
+    <button class="btn btn-red"   onclick="printMultiPageInvoice()">🖨️ Print / PDF</button>
+  </div>
+
+  <div class="page" id="invoicePage">
+    <div class="title-bar"><h1>QUOTATION</h1><span class="orig-copy">Original Copy</span></div>
+
+    <div class="header-grid">
+      <div class="co-block">
+        <img class="co-logo" id="coLogoImg" src="./logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/84x84/d93a39/white?text=PRECON'">
+        <div>
+          <div class="co-name" contenteditable="true">PRECON CEMENTANIOUS</div>
+          <div class="co-tagline">Manufacturers of Precast Concrete Members</div>
+          <div class="co-addr">
+            <span contenteditable="true">SFNO.53/2A1A Pallikonda Via, Vasandanadai Eraiayankadu Post,<br>Okkanapuram, Vellore – 632104</span><br>
+            <b>Phone :</b> <span contenteditable="true">95850 77789</span> &nbsp;|&nbsp;
+            <b>Email :</b> <span contenteditable="true">info@preconcementanious.com</span><br>
+            <b>State :</b> Tamilnadu &nbsp;|&nbsp; <b>Code :</b> 33
+          </div>
+          <div class="co-gstin-badge" contenteditable="true">GSTIN: 33AJDPM3186H1Z9</div>
+        </div>
+      </div>
+      <div class="inv-meta">
+        <div class="inv-meta-title">Invoice Details</div>
+        <table>
+          <tr><td>No.</td>       <td id="invNo"       contenteditable="true">PRO/25-26/004</td> </tr>
+          <tr><td>Date</td>      <td id="invDate"      contenteditable="true">07-04-2026</td> </tr>
+          <tr><td>Buyer Ref.</td><td id="buyerRef"     contenteditable="true">DLF/PO/0426</td> </tr>
+          <tr><td>Other Ref.</td><td id="otherRef"     contenteditable="true">—</td> </tr>
+          <tr><td>Supply</td>    <td id="supplyState"  contenteditable="true">Tamilnadu (33)</td> </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="cust-strip">
+      <div class="cust-block">
+        <span class="cust-lbl">Customer</span>
+        <div class="cust-name" id="custName" contenteditable="true">STONE MART CLADDING SYSTEM</div>
+        <div class="cust-addr" id="custAddr" contenteditable="true">Nelson Chambers E Block-115, 5th Floor,<br>Nelson Manickam Rd, Aminjikarai, Chennai,<br>Tamil Nadu – 600029</div>
+        <div class="cust-gstin" id="custGst" contenteditable="true">GST: 33ABWFS2954C1ZY | Ph: 9843330621</div>
+      </div>
+      <div class="cust-block">
+        <span class="cust-lbl">Ship To</span>
+        <div class="cust-name" id="shipName" contenteditable="true">DLF Foundation CSR PROJECT</div>
+        <div class="cust-addr" id="shipAddr" contenteditable="true">Manapakkam, Ramapuram,<br>Chennai, Tamil Nadu – 600089</div>
+        <div style="font-size:10px"><b>Contact :</b> <span id="shipPhone" contenteditable="true">877 897 3712</span></div>
+      </div>
+    </div>
+
+    <div class="items-wrap">
+      <table class="items" id="itemsTable">
+        <thead><tr><th>S.No</th><th>Items</th><th>QTY</th><th>Unit</th><th>Price</th><th>Amount</th></tr></thead>
+        <tbody id="itemsBody"></tbody>
+      </table>
+    </div>
+    <div class="row-ctrl">
+      <button onclick="addItemRow()">+ Add Item</button>
+      <button onclick="removeLastItem()">− Remove Last</button>
+    </div>
+
+    <div class="footer-three-col">
+      <div class="footer-bank">
+        <span class="blabel">🏦 Bank Details</span>
+        <table class="btable">
+          <tr><td>Bank Name</td><td>:</td><td contenteditable="true">City Union Bank</td></tr>
+          <tr><td>A/C No.</td><td>:</td><td contenteditable="true">510909010245780</td></tr>
+          <tr><td>IFSC</td><td>:</td><td contenteditable="true">CIUB0000294</td></tr>
+          <tr><td>Branch</td><td>:</td><td contenteditable="true">Sathuvachari</td></tr>
+        </table>
+      </div>
+      <div class="footer-terms">
+        <span class="blabel">📜 Terms &amp; Conditions</span>
+        <div class="tc-item"><span class="tc-num">1</span><span contenteditable="true">Advance Payment 50%</span></div>
+        <div class="tc-item"><span class="tc-num">2</span><span contenteditable="true">Return not accepted</span></div>
+        <div class="tc-item"><span class="tc-num">3</span><span contenteditable="true">Transport extra</span></div>
+        <div class="tc-item"><span class="tc-num">4</span><span contenteditable="true">Delivery 1 month</span></div>
+      </div>
+      <div class="footer-totals">
+        <table class="totals">
+          <tr class="subtotal-row"><td>Sub Total</td><td id="subTotal">₹ 0.00</td></tr>
+          <tr><td>SGST @ <select class="gst-rate-sel" id="sgstRate" onchange="recalc()"><option value="0">0%</option><option value="2.5">2.5%</option><option value="6">6%</option><option value="9" selected>9%</option><option value="14">14%</option></select></td><td id="sgstAmt">₹ 0.00</td></tr>
+          <tr><td>CGST @ <select class="gst-rate-sel" id="cgstRate" onchange="recalc()"><option value="0">0%</option><option value="2.5">2.5%</option><option value="6">6%</option><option value="9" selected>9%</option><option value="14">14%</option></select></td><td id="cgstAmt">₹ 0.00</td></tr>
+          <tr class="total-final-row"><td>Total</td><td id="grandTotal">₹ 0.00</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="amount-words">Amount in Words: <b id="amountWords">Rupees Zero Only</b></div>
+    <div class="sig-strip">
+      <div><div style="font-size:7.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;margin-left:10px">Company Seal</div><img class="seal-img-fixed" id="companySealImg" src="./logo.jpg" alt="Seal"></div>
+      <div style="text-align:right"><div style="font-size:13px;font-weight:700;margin-bottom:4px"><span style="color:var(--muted);">For </span> Precon Cementanious</div><div class="sig-area"><img class="sig-img-fixed" id="signatureImg" src="./signature.png" alt="Signature"></div><div class="sig-auth">Authorised Signatory</div></div>
+    </div>
+    <div class="red-bar"></div>
+  </div>
+</div>
+
+<div id="viewPage" class="page-section" style="display:none">
+  <div id="listView">
+    <div class="list-header"><h2>📄 Archived Invoices</h2><button class="btn btn-red" onclick="loadInvoices()">🔄 Refresh</button></div>
+    <div class="list-table-wrap">
+      <table class="list-table">
+        <thead><tr><th>Inv No</th><th>Date</th><th>Customer</th><th>Total</th><th style="text-align:center">Action</th></tr></thead>
+        <tbody id="listBody"><tr><td colspan="5">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="modal"><div id="modalBox"><div class="modal-header"><h3>Invoice Preview</h3><button class="modal-close" onclick="closeModal()">✕</button></div><div id="modalBody" style="padding:20px"></div></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
