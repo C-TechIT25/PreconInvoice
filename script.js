@@ -214,13 +214,17 @@ function render() {
 function recalc() {
   var sub = 0;
   items.forEach(function (it) { sub += it.qty * it.price; });
+  var disc = parseFloat(document.getElementById('discountRate').value) || 0;
   var sg = parseFloat(document.getElementById('sgstRate').value) || 0;
   var cg = parseFloat(document.getElementById('cgstRate').value) || 0;
+  var discAmt = sub * disc / 100;
+  var afterDisc = sub - discAmt;
   document.getElementById('subTotal').innerHTML = '₹ ' + fmt(sub);
-  document.getElementById('sgstAmt').innerHTML = '₹ ' + fmt(sub * sg / 100);
-  document.getElementById('cgstAmt').innerHTML = '₹ ' + fmt(sub * cg / 100);
-  document.getElementById('grandTotal').innerHTML = '₹ ' + fmt(sub + sub * sg / 100 + sub * cg / 100);
-  document.getElementById('amountWords').innerHTML = numWords(Math.round(sub + sub * sg / 100 + sub * cg / 100));
+  document.getElementById('discountAmt').innerHTML = '− ₹ ' + fmt(discAmt);
+  document.getElementById('sgstAmt').innerHTML = '₹ ' + fmt(afterDisc * sg / 100);
+  document.getElementById('cgstAmt').innerHTML = '₹ ' + fmt(afterDisc * cg / 100);
+  document.getElementById('grandTotal').innerHTML = '₹ ' + fmt(afterDisc + afterDisc * sg / 100 + afterDisc * cg / 100);
+  document.getElementById('amountWords').innerHTML = numWords(Math.round(afterDisc + afterDisc * sg / 100 + afterDisc * cg / 100));
 }
 
 function numWords(n) {
@@ -356,9 +360,12 @@ function getHeaderHtml() {
 function getFooterHtml() {
   var sub = 0;
   items.forEach(function (it) { sub += it.qty * it.price; });
+  var disc = parseFloat(document.getElementById('discountRate').value) || 0;
   var sg = parseFloat(document.getElementById('sgstRate').value) || 0;
   var cg = parseFloat(document.getElementById('cgstRate').value) || 0;
-  var grand = sub + sub * sg / 100 + sub * cg / 100;
+  var discAmt = sub * disc / 100;
+  var afterDisc = sub - discAmt;
+  var grand = afterDisc + afterDisc * sg / 100 + afterDisc * cg / 100;
   return '<div class="footer-three-col">' +
     '<div class="footer-bank"><span class="blabel">🏦 Bank Details</span>' +
     '<table class="btable">' + document.querySelector('.footer-bank .btable').innerHTML + '</table></div>' +
@@ -366,9 +373,10 @@ function getFooterHtml() {
     document.querySelector('.footer-terms').innerHTML.replace(/<span class="blabel">.*?<\/span>/, '') + '</div>' +
     '<div class="footer-totals"><table class="totals">' +
     '<tr class="subtotal-row"><td>Sub Total</td><td>₹ ' + fmt(sub) + '</td></tr>' +
-    '<tr><td>SGST @ ' + sg + '%</td><td>₹ ' + fmt(sub * sg / 100) + '</td></tr>' +
-    '<tr><td>CGST @ ' + cg + '%</td><td>₹ ' + fmt(sub * cg / 100) + '</td></tr>' +
-    '<tr class="total-final-row"><td>Total</td><td>₹ ' + fmt(grand) + '</td></tr>' +
+    (disc > 0 ? '<tr class="discount-row"><td>Discount @ ' + disc + '%</td><td>− ₹ ' + fmt(discAmt) + '</td></tr>' : '') +
+    '<tr><td>SGST @ ' + sg + '%</td><td>₹ ' + fmt(afterDisc * sg / 100) + '</td></tr>' +
+    '<tr><td>CGST @ ' + cg + '%</td><td>₹ ' + fmt(afterDisc * cg / 100) + '</td></tr>' +
+    '<tr class="total-final-row"><td>Grand Total</td><td>₹ ' + fmt(grand) + '</td></tr>' +
     '</table></div></div>' +
     '<div class="amount-words">Amount in Words: <b>' + numWords(Math.round(grand)) + '</b></div>' +
     document.querySelector('.sig-strip').outerHTML +
@@ -414,8 +422,11 @@ function printMultiPageInvoice() {
 function collectData() {
   var sub = 0;
   items.forEach(function (it) { sub += it.qty * it.price; });
+  var disc = parseFloat(document.getElementById('discountRate').value) || 0;
   var sg = parseFloat(document.getElementById('sgstRate').value) || 0;
   var cg = parseFloat(document.getElementById('cgstRate').value) || 0;
+  var discAmt = sub * disc / 100;
+  var afterDisc = sub - discAmt;
   return {
     invoiceNo: document.getElementById('invNo').innerText.trim(),
     invoiceDate: document.getElementById('invDate').innerText.trim(),
@@ -435,11 +446,12 @@ function collectData() {
     items: items.map(function (it) {
       return { name: it.name, specs: it.specs, qty: it.qty, unit: it.unit, price: it.price, amount: it.qty * it.price };
     }),
+    discountRate: disc, discountAmt: discAmt,
     sgstRate: sg, cgstRate: cg,
     subTotal: sub,
-    sgstAmt: sub * sg / 100,
-    cgstAmt: sub * cg / 100,
-    grandTotal: sub + sub * sg / 100 + sub * cg / 100,
+    sgstAmt: afterDisc * sg / 100,
+    cgstAmt: afterDisc * cg / 100,
+    grandTotal: afterDisc + afterDisc * sg / 100 + afterDisc * cg / 100,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     createdBy: auth.currentUser ? auth.currentUser.uid : null
   };

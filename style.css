@@ -848,6 +848,37 @@ table.totals td {
   cursor: pointer;
 }
 
+.discount-input {
+  width: 48px;
+  font-size: 10px;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--red-m);
+  border: none;
+  color: var(--red-d);
+  font-weight: 700;
+  border-radius: 3px;
+  padding: 2px 4px;
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.discount-input::-webkit-outer-spin-button,
+.discount-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.discount-input:focus {
+  box-shadow: 0 0 0 2px rgba(217, 58, 57, 0.25);
+}
+
+.discount-row td {
+  color: #e74c3c;
+  font-weight: 600;
+  font-style: italic;
+}
+
 .total-final-row td {
   background: var(--red) !important;
   color: #fff !important;

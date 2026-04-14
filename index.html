@@ -215,6 +215,11 @@
                 <td>Sub Total</td>
                 <td id="subTotal">₹ 0.00</td>
               </tr>
+              <tr class="discount-row">
+                <td>Discount @ <input type="number" class="discount-input" id="discountRate" value="0" min="0" max="100"
+                    step="1" oninput="recalc()">%</td>
+                <td id="discountAmt">− ₹ 0.00</td>
+              </tr>
               <tr>
                 <td>SGST @ <select class="gst-rate-sel" id="sgstRate" onchange="recalc()">
                     <option value="0">0%</option>
@@ -236,7 +241,7 @@
                 <td id="cgstAmt">₹ 0.00</td>
               </tr>
               <tr class="total-final-row">
-                <td>Total</td>
+                <td>Grand Total</td>
                 <td id="grandTotal">₹ 0.00</td>
               </tr>
             </table>
