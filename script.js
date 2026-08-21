@@ -477,6 +477,11 @@ function collectData() {
 }
 
 function saveToFirestore() {
+  if (editingId) {
+    updateCurrentInvoice();
+    return;
+  }
+
   var btn = document.getElementById('saveBtn');
   btn.textContent = 'Saving…';
   btn.disabled = true;
@@ -491,6 +496,86 @@ function saveToFirestore() {
       btn.textContent = '💾 Save to Firestore';
       btn.disabled = false;
     });
+}
+
+function updateCurrentInvoice() {
+  var btn = document.getElementById('saveBtn');
+  var data = collectData();
+  delete data.createdAt;
+  delete data.createdBy;
+  data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+
+  btn.textContent = 'Updating…';
+  btn.disabled = true;
+  db.collection('invoices').doc(editingId).update(data)
+    .then(function () {
+      toast('✅ Invoice updated successfully!');
+      btn.textContent = '💾 Update Invoice';
+      btn.disabled = false;
+    })
+    .catch(function (e) {
+      toast('❌ ' + e.message, '#ef4444');
+      btn.textContent = '💾 Update Invoice';
+      btn.disabled = false;
+    });
+}
+
+function setEditableText(id, value) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = esc(value || '').replace(/\n/g, '<br>');
+}
+
+function setCreatePageMode(isEditing, invoiceNo) {
+  var title = document.getElementById('toolbarTitle');
+  var saveBtn = document.getElementById('saveBtn');
+  var cancelBtn = document.getElementById('cancelEditBtn');
+  if (title) title.textContent = isEditing ? '✏️ Edit Invoice — ' + (invoiceNo || '') : '🏗️ PRECON — Proforma Invoice';
+  if (saveBtn) saveBtn.textContent = isEditing ? '💾 Update Invoice' : '💾 Save to Firestore';
+  if (cancelBtn) cancelBtn.style.display = isEditing ? 'inline-block' : 'none';
+}
+
+function loadInvoiceIntoCreatePage(id, d) {
+  editingId = id;
+  setEditableText('invNo', d.invoiceNo);
+  setEditableText('invDate', d.invoiceDate);
+  setEditableText('buyerRef', d.buyerRef);
+  setEditableText('otherRef', d.otherRef);
+  setEditableText('supplyState', d.supplyState);
+  setEditableText('custName', d.customer && d.customer.name);
+  setEditableText('custAddr', d.customer && d.customer.address);
+  setEditableText('custGst', d.customer && d.customer.gstin);
+  setEditableText('shipName', d.shipTo && d.shipTo.name);
+  setEditableText('shipAddr', d.shipTo && d.shipTo.address);
+  setEditableText('shipPhone', d.shipTo && d.shipTo.phone);
+
+  document.getElementById('discountRate').value = d.discountRate || 0;
+  setSelectValue('sgstRate', d.sgstRate);
+  setSelectValue('cgstRate', d.cgstRate);
+
+  items = (d.items || []).map(function (it) {
+    return {
+      name: it.name || '',
+      specs: it.specs || [],
+      qty: parseFloat(it.qty) || 0,
+      unit: it.unit || '',
+      price: parseFloat(it.price) || 0
+    };
+  });
+  if (!items.length) {
+    items = [{ name: 'New Product', specs: [{ k: 'Specification', v: 'Value' }], qty: 1, unit: 'Nos', price: 0 }];
+  }
+
+  render();
+  setCreatePageMode(true, d.invoiceNo);
+  showPage('createPage', document.getElementById('navCreate'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelEditMode() {
+  editingId = null;
+  setCreatePageMode(false);
+  showPage('viewPage', document.getElementById('navView'));
 }
 
 // ============================================================
@@ -755,38 +840,20 @@ var editItems = [];
 
 function openEditModal(id) {
   if (activeMenu) { activeMenu.classList.remove('show'); activeMenu = null; }
-  editingId = id;
   db.collection('invoices').doc(id).get().then(function (ds) {
     if (!ds.exists) { toast('❌ Invoice not found', '#ef4444'); return; }
-    var d = ds.data();
-    // Populate fields
-    document.getElementById('eInvNo').value = d.invoiceNo || '';
-    document.getElementById('eInvDate').value = d.invoiceDate || '';
-    document.getElementById('eBuyerRef').value = d.buyerRef || '';
-    document.getElementById('eOtherRef').value = d.otherRef || '';
-    document.getElementById('eSupplyState').value = d.supplyState || '';
-    document.getElementById('eCustName').value = (d.customer && d.customer.name) || '';
-    document.getElementById('eCustAddr').value = (d.customer && d.customer.address) || '';
-    document.getElementById('eCustGst').value = (d.customer && d.customer.gstin) || '';
-    document.getElementById('eShipName').value = (d.shipTo && d.shipTo.name) || '';
-    document.getElementById('eShipAddr').value = (d.shipTo && d.shipTo.address) || '';
-    document.getElementById('eShipPhone').value = (d.shipTo && d.shipTo.phone) || '';
-    // Tax rates
-    setSelectValue('eSgstRate', d.sgstRate);
-    setSelectValue('eCgstRate', d.cgstRate);
-    // Items
-    editItems = (d.items || []).map(function (it) {
-      return { name: it.name, specs: it.specs || [], qty: it.qty, unit: it.unit, price: it.price };
-    });
-    renderEditItems();
-    openModal('editModal');
+    loadInvoiceIntoCreatePage(id, ds.data());
+    toast('✏️ Invoice loaded for editing');
+  }).catch(function (e) {
+    toast('❌ ' + e.message, '#ef4444');
   });
 }
 
 function setSelectValue(id, val) {
   var el = document.getElementById(id);
+  val = parseFloat(val) || 0;
   for (var i = 0; i < el.options.length; i++) {
-    if (parseFloat(el.options[i].value) === parseFloat(val)) {
+    if (parseFloat(el.options[i].value) === val) {
       el.selectedIndex = i;
       break;
     }
