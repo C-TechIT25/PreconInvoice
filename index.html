@@ -82,8 +82,9 @@
     <!-- CREATE PAGE -->
     <div id="createPage" class="page-section">
       <div class="toolbar">
-        <div class="tb-brand">🏗️ PRECON — Proforma Invoice</div>
+        <div class="tb-brand" id="toolbarTitle">🏗️ PRECON — Proforma Invoice</div>
         <button class="btn btn-green" id="saveBtn" onclick="saveToFirestore()">💾 Save to Firestore</button>
+        <button class="btn btn-ghost-dark" id="cancelEditBtn" onclick="cancelEditMode()" style="display:none">Cancel Edit</button>
         <button class="btn btn-red" onclick="printMultiPageInvoice()">🖨️ Print / PDF</button>
       </div>
 
