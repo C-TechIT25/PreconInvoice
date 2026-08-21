@@ -294,6 +294,21 @@ var PRINT_CSS = [
   '.cust-addr{color:#555;font-size:10px}',
   '.cust-gstin{display:inline-block;margin-top:5px;background:#ffd6d6;color:#d93a39;padding:2px 7px;border-radius:3px;font-family:monospace;font-size:9px;font-weight:700}',
   '.items-wrap{padding:0 0px 10px}',
+  'table.items{width:100%;border-collapse:collapse;table-layout:fixed;font-size:10pt}',
+  'table.items thead tr{background:#fe5958;color:#fff}',
+  'table.items thead th{padding:9px 10px;font-size:8px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#fff;vertical-align:middle;white-space:nowrap}',
+  'table.items th:nth-child(1),table.items td:nth-child(1){width:46px;text-align:center}',
+  'table.items th:nth-child(2),table.items td:nth-child(2){width:auto;text-align:left}',
+  'table.items th:nth-child(3),table.items td:nth-child(3){width:70px;text-align:center}',
+  'table.items th:nth-child(4),table.items td:nth-child(4){width:64px;text-align:center}',
+  'table.items th:nth-child(5),table.items td:nth-child(5){width:82px;text-align:right}',
+  'table.items th:nth-child(6),table.items td:nth-child(6){width:125px;text-align:right;white-space:nowrap}',
+  'table.items tbody tr{border-bottom:1px solid #ffd6d6}',
+  'table.items tbody td{padding:10px;vertical-align:top;font-size:10px;line-height:1.35}',
+  'table.items .item-name{display:block;font-size:11.5px;font-weight:800;margin-bottom:4px}',
+  'table.items .amount-cell{font-weight:800;color:#d93a39}',
+  '.spec-line{display:grid;grid-template-columns:80px 8px 1fr;column-gap:4px;font-size:9px;margin:2px 0;line-height:1.25}',
+  '.spec-key{color:#d93a39;font-weight:600}',
   '.detail-items-table tbody td{  padding: 10px 12px; border-bottom: 1px solid #f1f5f9;vertical-align: top;}',
   '.items-wrap table.items{margin-bottom:0!important;border-bottom:none!important}',
   '.footer-three-col{margin-top:0!important;border-top:2px solid #fe5958}',
@@ -307,8 +322,11 @@ var PRINT_CSS = [
   '.tc-num{color:#fe5958;font-weight:700;flex-shrink:0}',
   'table.totals{width:100%;border-collapse:collapse}',
   'table.totals td{padding:6px 10px;font-size:10.5px;border-bottom:1px solid #ffd6d6}',
+  'table.totals td:last-child{text-align:right;font-weight:700}',
   '.subtotal-row td{font-weight:600;background:#fff5f5}',
-  '.total-final-row td{background:#fe5958!important;color:#fff!important;font-weight:800;font-size:13px;border:none;padding:10px}',
+  '.total-final-row td{background:#fe5958!important;color:#fff!important;font-weight:900;font-size:16px;border:none;padding:12px 8px;line-height:1.15;white-space:nowrap}',
+  '.total-final-row td:first-child{width:44%;text-align:left;font-size:16px!important;font-weight:900!important}',
+  '.total-final-row td:last-child{width:56%;font-size:16px!important;font-weight:900!important;text-align:right}',
   '.amount-words{padding:8px 20px;background:#fff5f5;border-top:1px solid #ffd6d6;font-size:10px;font-weight:500}',
   '.sig-strip{display:flex;justify-content:space-between;align-items:flex-end;padding:16px 24px 22px;border-top:1px solid #ffd6d6}',
 
@@ -321,32 +339,33 @@ var PRINT_CSS = [
   '@media print{body{margin:0;padding:0}.pp{page-break-after:always;min-height:297mm}.pp:last-child{page-break-after:auto}}'
 ].join('');
 
-var TH = '<table style="width:100%;border-collapse:collapse;">' +
-  '<thead><tr style="background:#fe5958;color:#fff">' +
-  '<th style="padding:9px 10px;text-align:center;width:40px;font-size:8px;letter-spacing:1px;text-transform:uppercase">S.No</th>' +
-  '<th style="padding:9px 10px;text-align:left;width:185px;font-size:8px;letter-spacing:1px;text-transform:uppercase">Items</th>' +
-  '<th style="padding:9px 10px;text-align:center;width:55px;font-size:8px;letter-spacing:1px;text-transform:uppercase">QTY</th>' +
-  '<th style="padding:9px 10px;text-align:center;width:55px;font-size:8px;letter-spacing:1px;text-transform:uppercase">Unit</th>' +
-  '<th style="padding:9px 10px;text-align:right;width:80px;font-size:8px;letter-spacing:1px;text-transform:uppercase">Price</th>' +
-  '<th style="padding:9px 10px;text-align:right;width:90px;font-size:8px;letter-spacing:1px;text-transform:uppercase">Amount</th>' +
+var ITEM_COLGROUP = '<colgroup><col style="width:46px"><col><col style="width:70px"><col style="width:64px"><col style="width:82px"><col style="width:125px"></colgroup>';
+
+var TH = '<table class="items">' + ITEM_COLGROUP +
+  '<thead><tr>' +
+  '<th>S.No</th>' +
+  '<th>Items</th>' +
+  '<th>QTY</th>' +
+  '<th>Unit</th>' +
+  '<th>Price</th>' +
+  '<th>Amount</th>' +
   '</tr></thead><tbody>';
 
 function buildItemRows() {
   return items.map(function (item, idx) {
     var specsHtml = item.specs.map(function (s) {
-      return '<div style="display:flex;gap:6px;font-size:9px;margin:2px 0">' +
-        '<span style="color:#d93a39;font-weight:600;min-width:80px">' + esc(s.k) + '</span>' +
-        ' : <span>' + esc(s.v) + '</span></div>';
+      return '<div class="spec-line">' +
+        '<span class="spec-key">' + esc(s.k) + '</span><span>:</span><span>' + esc(s.v) + '</span></div>';
     }).join('');
     var amt = item.qty * item.price;
     return '<tr style="border-bottom:1px solid #ffd6d6">' +
-      '<td style="padding:10px;text-align:center;vertical-align:top">' + (idx + 1) + '</td>' +
-      '<td style="padding:10px;vertical-align:top"><strong style="font-size:11px">' + esc(item.name) + '</strong>' +
+      '<td>' + (idx + 1) + '</td>' +
+      '<td><strong class="item-name">' + esc(item.name) + '</strong>' +
       '<div style="margin-top:4px">' + specsHtml + '</div></td>' +
-      '<td style="padding:10px;text-align:center;vertical-align:top">' + item.qty + '</td>' +
-      '<td style="padding:10px;text-align:center;vertical-align:top">' + esc(item.unit) + '</td>' +
-      '<td style="padding:10px;text-align:right;vertical-align:top">₹ ' + fmt(item.price) + '</td>' +
-      '<td style="padding:10px;text-align:right;font-weight:700;color:#d93a39;vertical-align:top">₹ ' + fmt(amt) + '</td>' +
+      '<td>' + item.qty + '</td>' +
+      '<td>' + esc(item.unit) + '</td>' +
+      '<td>₹ ' + fmt(item.price) + '</td>' +
+      '<td class="amount-cell">₹ ' + fmt(amt) + '</td>' +
       '</tr>';
   });
 }
@@ -376,7 +395,7 @@ function getFooterHtml() {
     (disc > 0 ? '<tr class="discount-row"><td>Discount @ ' + disc + '%</td><td>− ₹ ' + fmt(discAmt) + '</td></tr>' : '') +
     '<tr><td>SGST @ ' + sg + '%</td><td>₹ ' + fmt(afterDisc * sg / 100) + '</td></tr>' +
     '<tr><td>CGST @ ' + cg + '%</td><td>₹ ' + fmt(afterDisc * cg / 100) + '</td></tr>' +
-    '<tr class="total-final-row"><td>Grand Total</td><td>₹ ' + fmt(grand) + '</td></tr>' +
+    '<tr class="total-final-row"><td style="width:44%;text-align:left;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">Grand Total</td><td style="width:56%;text-align:right;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">₹ ' + fmt(grand) + '</td></tr>' +
     '</table></div></div>' +
     '<div class="amount-words">Amount in Words: <b>' + numWords(Math.round(grand)) + '</b></div>' +
     document.querySelector('.sig-strip').outerHTML +
@@ -892,7 +911,7 @@ function renderStaticInvoice(d) {
     '<tr class="subtotal-row"><td>Sub Total</td><td>₹ ' + fmt(d.subTotal) + '</td></tr>' +
     '<tr><td>SGST @ ' + d.sgstRate + '%</td><td>₹ ' + fmt(d.sgstAmt) + '</td></tr>' +
     '<tr><td>CGST @ ' + d.cgstRate + '%</td><td>₹ ' + fmt(d.cgstAmt) + '</td></tr>' +
-    '<tr class="total-final-row"><td>Total</td><td>₹ ' + fmt(d.grandTotal) + '</td></tr>' +
+    '<tr class="total-final-row"><td style="width:44%;text-align:left;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">Grand Total</td><td style="width:56%;text-align:right;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">₹ ' + fmt(d.grandTotal) + '</td></tr>' +
     '</table></div></div>' +
     '<div class="amount-words">Amount in Words: <b>' + numWords(Math.round(d.grandTotal)) + '</b></div>' +
     document.querySelector('.sig-strip').outerHTML +
