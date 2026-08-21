@@ -668,6 +668,7 @@ body {
 table.items {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   font-size: 10pt;
 }
 
@@ -678,40 +679,41 @@ table.items thead tr {
 table.items thead th {
   padding: 9px 10px;
   font-size: 8px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 1px;
   text-transform: uppercase;
   color: #fff;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 table.items thead th:nth-child(1) {
   text-align: center;
-  width: 40px;
+  width: 46px;
 }
 
 table.items thead th:nth-child(2) {
   text-align: left;
-  width: 185px;
 }
 
 table.items thead th:nth-child(3) {
   text-align: center;
-  width: 55px;
+  width: 70px;
 }
 
 table.items thead th:nth-child(4) {
   text-align: center;
-  width: 55px;
+  width: 64px;
 }
 
 table.items thead th:nth-child(5) {
   text-align: right;
-  width: 80px;
+  width: 82px;
 }
 
 table.items thead th:nth-child(6) {
   text-align: right;
-  width: 90px;
+  width: 125px;
 }
 
 table.items tbody tr {
@@ -721,6 +723,22 @@ table.items tbody tr {
 table.items tbody td {
   padding: 10px;
   vertical-align: top;
+  line-height: 1.35;
+}
+
+table.items tbody td:nth-child(1),
+table.items tbody td:nth-child(3),
+table.items tbody td:nth-child(4) {
+  text-align: center;
+}
+
+table.items tbody td:nth-child(5),
+table.items tbody td:nth-child(6) {
+  text-align: right;
+}
+
+table.items tbody td:nth-child(6) {
+  white-space: nowrap;
 }
 
 input.ei {
@@ -740,17 +758,17 @@ input.ei:focus {
 }
 
 .spec-line {
-  display: flex;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: 80px 8px 1fr;
+  column-gap: 4px;
   font-size: 9px;
   margin: 3px 0;
-  flex-wrap: wrap;
+  line-height: 1.25;
 }
 
 .spec-key {
   color: var(--red-d);
   font-weight: 600;
-  min-width: 80px;
 }
 
 .row-ctrl {
@@ -832,6 +850,11 @@ table.totals td {
   border-bottom: 1px solid var(--red-m);
 }
 
+table.totals td:last-child {
+  text-align: right;
+  font-weight: 700;
+}
+
 .subtotal-row td {
   font-weight: 600;
   background: var(--red-l);
@@ -882,10 +905,26 @@ table.totals td {
 .total-final-row td {
   background: var(--red) !important;
   color: #fff !important;
-  font-weight: 800;
-  font-size: 13px;
+  font-weight: 900;
+  font-size: 16px;
   border: none;
-  padding: 10px;
+  padding: 12px 8px;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.total-final-row td:first-child {
+  width: 44%;
+  text-align: left;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+}
+
+.total-final-row td:last-child {
+  width: 56%;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  text-align: right;
 }
 
 .amount-words {
