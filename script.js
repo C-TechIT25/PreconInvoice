@@ -161,6 +161,10 @@ var items = [
   }
 ];
 
+var MIN_TERMS = 4;
+var MAX_TERMS = 6;
+var DEFAULT_TERMS = ['Advance Payment 50%', 'Return not accepted', 'Transport extra', 'Delivery 1 month'];
+
 // ============================================================
 // RENDER EDITOR
 // ============================================================
@@ -261,6 +265,57 @@ function removeLastSpec(i) {
   if (items[i].specs.length > 1) { items[i].specs.pop(); render(); }
 }
 
+function normalizeTerms(terms) {
+  var source = Array.isArray(terms) && terms.length ? terms : DEFAULT_TERMS;
+  var normalized = source.slice(0, MAX_TERMS).map(function (term) {
+    return String(term || '').trim();
+  });
+  while (normalized.length < MIN_TERMS) normalized.push('');
+  return normalized;
+}
+
+function buildTermItemsHtml(terms, editable) {
+  return normalizeTerms(terms).map(function (term, i) {
+    return '<div class="tc-item"><span class="tc-num">' + (i + 1) + '</span><span' +
+      (editable ? ' contenteditable="true"' : '') + '>' + esc(term) + '</span></div>';
+  }).join('');
+}
+
+function getInvoiceTerms() {
+  var list = document.getElementById('termsList') || document.querySelector('.footer-terms');
+  if (!list) return normalizeTerms([]);
+  var terms = Array.from(list.querySelectorAll('.tc-item span[contenteditable]')).map(function (el) {
+    return el.innerText.trim();
+  });
+  return normalizeTerms(terms);
+}
+
+function renderTerms(terms) {
+  var list = document.getElementById('termsList');
+  if (!list) return;
+  list.innerHTML = buildTermItemsHtml(terms, true);
+}
+
+function addTermPoint() {
+  var terms = getInvoiceTerms();
+  if (terms.length >= MAX_TERMS) {
+    toast('Maximum 6 terms allowed', '#f59e0b');
+    return;
+  }
+  terms.push('New term');
+  renderTerms(terms);
+}
+
+function removeTermPoint() {
+  var terms = getInvoiceTerms();
+  if (terms.length <= MIN_TERMS) {
+    toast('Minimum 4 terms required', '#f59e0b');
+    return;
+  }
+  terms.pop();
+  renderTerms(terms);
+}
+
 // ============================================================
 // PRINT / PDF (Create Page)
 // ============================================================
@@ -319,6 +374,7 @@ var PRINT_CSS = [
   '.blabel{font-size:7.5px;letter-spacing:2px;text-transform:uppercase;color:#fe5958;font-weight:700;margin-bottom:8px;display:block}',
   '.btable td{padding:2px 6px 2px 0;font-size:10px}',
   '.tc-item{display:flex;gap:8px;font-size:10px;color:#555;margin-bottom:5px}',
+  '.tc-actions{display:none!important}',
   '.tc-num{color:#fe5958;font-weight:700;flex-shrink:0}',
   'table.totals{width:100%;border-collapse:collapse}',
   'table.totals td{padding:6px 10px;font-size:10.5px;border-bottom:1px solid #ffd6d6}',
@@ -388,8 +444,8 @@ function getFooterHtml() {
   return '<div class="footer-three-col">' +
     '<div class="footer-bank"><span class="blabel">🏦 Bank Details</span>' +
     '<table class="btable">' + document.querySelector('.footer-bank .btable').innerHTML + '</table></div>' +
-    '<div class="footer-terms"><span class="blabel">📜 Terms &amp; Conditions</span>' +
-    document.querySelector('.footer-terms').innerHTML.replace(/<span class="blabel">.*?<\/span>/, '') + '</div>' +
+    '<div class="footer-terms"><span class="blabel">Terms &amp; Conditions</span>' +
+    buildTermItemsHtml(getInvoiceTerms(), false) + '</div>' +
     '<div class="footer-totals"><table class="totals">' +
     '<tr class="subtotal-row"><td>Sub Total</td><td>₹ ' + fmt(sub) + '</td></tr>' +
     (disc > 0 ? '<tr class="discount-row"><td>Discount @ ' + disc + '%</td><td>− ₹ ' + fmt(discAmt) + '</td></tr>' : '') +
@@ -465,6 +521,7 @@ function collectData() {
     items: items.map(function (it) {
       return { name: it.name, specs: it.specs, qty: it.qty, unit: it.unit, price: it.price, amount: it.qty * it.price };
     }),
+    terms: getInvoiceTerms(),
     discountRate: disc, discountAmt: discAmt,
     sgstRate: sg, cgstRate: cg,
     subTotal: sub,
@@ -552,6 +609,7 @@ function loadInvoiceIntoCreatePage(id, d) {
   document.getElementById('discountRate').value = d.discountRate || 0;
   setSelectValue('sgstRate', d.sgstRate);
   setSelectValue('cgstRate', d.cgstRate);
+  renderTerms(d.terms || DEFAULT_TERMS);
 
   items = (d.items || []).map(function (it) {
     return {
@@ -973,7 +1031,7 @@ function renderStaticInvoice(d) {
     '<div class="items-wrap"><table class="items"><thead><tr><th>S.No</th><th>Items</th><th>QTY</th><th>Unit</th><th>Price</th><th>Amount</th></tr></thead><tbody>' + itemsHtml + '</tbody></table></div>' +
     '<div class="footer-three-col">' +
     '<div class="footer-bank">' + document.querySelector('.footer-bank').innerHTML + '</div>' +
-    '<div class="footer-terms">' + document.querySelector('.footer-terms').innerHTML + '</div>' +
+    '<div class="footer-terms"><span class="blabel">Terms &amp; Conditions</span>' + buildTermItemsHtml(d.terms || DEFAULT_TERMS, false) + '</div>' +
     '<div class="footer-totals"><table class="totals">' +
     '<tr class="subtotal-row"><td>Sub Total</td><td>₹ ' + fmt(d.subTotal) + '</td></tr>' +
     '<tr><td>SGST @ ' + d.sgstRate + '%</td><td>₹ ' + fmt(d.sgstAmt) + '</td></tr>' +
