@@ -833,10 +833,32 @@ input.ei:focus {
   margin-bottom: 5px;
 }
 
+.tc-item span[contenteditable] {
+  flex: 1;
+  min-width: 0;
+}
+
 .tc-num {
   color: var(--red);
   font-weight: 700;
   flex-shrink: 0;
+}
+
+.tc-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.tc-actions button {
+  font-size: 9px;
+  padding: 2px 8px;
+  border: 1px solid var(--red-m);
+  background: #fff;
+  color: var(--red-d);
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
 table.totals {
@@ -1674,6 +1696,7 @@ table.list-table tbody tr:last-child td {
 
   .toolbar,
   .row-ctrl,
+  .tc-actions,
   #toast,
   #listView,
   .modal-overlay,
