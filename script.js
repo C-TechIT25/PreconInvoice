@@ -380,6 +380,7 @@ var PRINT_CSS = [
   'table.totals td{padding:6px 10px;font-size:10.5px;border-bottom:1px solid #ffd6d6}',
   'table.totals td:last-child{text-align:right;font-weight:700}',
   '.subtotal-row td{font-weight:600;background:#fff5f5}',
+  '.discount-row td{color:#e74c3c;font-weight:600;font-style:italic}',
   '.total-final-row td{background:#fe5958!important;color:#fff!important;font-weight:900;font-size:16px;border:none;padding:12px 8px;line-height:1.15;white-space:nowrap}',
   '.total-final-row td:first-child{width:44%;text-align:left;font-size:16px!important;font-weight:900!important}',
   '.total-final-row td:last-child{width:56%;font-size:16px!important;font-weight:900!important;text-align:right}',
@@ -448,7 +449,7 @@ function getFooterHtml() {
     buildTermItemsHtml(getInvoiceTerms(), false) + '</div>' +
     '<div class="footer-totals"><table class="totals">' +
     '<tr class="subtotal-row"><td>Sub Total</td><td>₹ ' + fmt(sub) + '</td></tr>' +
-    (disc > 0 ? '<tr class="discount-row"><td>Discount @ ' + disc + '%</td><td>− ₹ ' + fmt(discAmt) + '</td></tr>' : '') +
+    '<tr class="discount-row"><td>Discount @ ' + disc + '%</td><td>− ₹ ' + fmt(discAmt) + '</td></tr>' +
     '<tr><td>SGST @ ' + sg + '%</td><td>₹ ' + fmt(afterDisc * sg / 100) + '</td></tr>' +
     '<tr><td>CGST @ ' + cg + '%</td><td>₹ ' + fmt(afterDisc * cg / 100) + '</td></tr>' +
     '<tr class="total-final-row"><td style="width:44%;text-align:left;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">Grand Total</td><td style="width:56%;text-align:right;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">₹ ' + fmt(grand) + '</td></tr>' +
@@ -748,6 +749,10 @@ function viewInvoiceDetail(id) {
 }
 
 function buildDetailHtml(d) {
+  var discountRate = parseFloat(d.discountRate) || 0;
+  var discountAmt = parseFloat(d.discountAmt);
+  if (isNaN(discountAmt)) discountAmt = (parseFloat(d.subTotal) || 0) * discountRate / 100;
+
   // Summary cards
   var cards = '<div class="detail-grid">' +
     '<div class="detail-card">' +
@@ -773,6 +778,7 @@ function buildDetailHtml(d) {
     '<div class="detail-card">' +
     '<div class="detail-card-title">💰 Financials</div>' +
     '<div class="detail-row"><span class="dlabel">Sub Total</span><span class="dval">₹ ' + fmt(d.subTotal) + '</span></div>' +
+    '<div class="detail-row"><span class="dlabel">Discount (' + discountRate + '%)</span><span class="dval">− ₹ ' + fmt(discountAmt) + '</span></div>' +
     '<div class="detail-row"><span class="dlabel">SGST (' + d.sgstRate + '%)</span><span class="dval">₹ ' + fmt(d.sgstAmt) + '</span></div>' +
     '<div class="detail-row"><span class="dlabel">CGST (' + d.cgstRate + '%)</span><span class="dval">₹ ' + fmt(d.cgstAmt) + '</span></div>' +
     '<div class="detail-row" style="background:#fff5f5;border-radius:8px;padding:8px 10px;margin-top:4px"><span class="dlabel" style="color:#d93a39;font-weight:700">Grand Total</span><span class="dval" style="color:#d93a39;font-size:16px">₹ ' + fmt(d.grandTotal) + '</span></div>' +
@@ -1015,6 +1021,9 @@ function renderStaticInvoice(d) {
       '<td style="text-align:right">₹ ' + fmt(it.price) + '</td>' +
       '<td style="text-align:right;font-weight:700;color:#d93a39">₹ ' + fmt(it.amount) + '</td></tr>';
   }).join('');
+  var discountRate = parseFloat(d.discountRate) || 0;
+  var discountAmt = parseFloat(d.discountAmt);
+  if (isNaN(discountAmt)) discountAmt = (parseFloat(d.subTotal) || 0) * discountRate / 100;
 
   return '<div class="title-bar"><h1>QUOTATION</h1><span class="orig-copy">Original Copy</span></div>' +
     '<div class="header-grid">' +
@@ -1034,6 +1043,7 @@ function renderStaticInvoice(d) {
     '<div class="footer-terms"><span class="blabel">Terms &amp; Conditions</span>' + buildTermItemsHtml(d.terms || DEFAULT_TERMS, false) + '</div>' +
     '<div class="footer-totals"><table class="totals">' +
     '<tr class="subtotal-row"><td>Sub Total</td><td>₹ ' + fmt(d.subTotal) + '</td></tr>' +
+    '<tr class="discount-row"><td>Discount @ ' + discountRate + '%</td><td>− ₹ ' + fmt(discountAmt) + '</td></tr>' +
     '<tr><td>SGST @ ' + d.sgstRate + '%</td><td>₹ ' + fmt(d.sgstAmt) + '</td></tr>' +
     '<tr><td>CGST @ ' + d.cgstRate + '%</td><td>₹ ' + fmt(d.cgstAmt) + '</td></tr>' +
     '<tr class="total-final-row"><td style="width:44%;text-align:left;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">Grand Total</td><td style="width:56%;text-align:right;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">₹ ' + fmt(d.grandTotal) + '</td></tr>' +
