@@ -389,6 +389,35 @@ body {
   margin-right: auto;
 }
 
+.discount-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+}
+
+.discount-toggle label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.discount-toggle input {
+  accent-color: var(--red);
+  margin: 0;
+}
+
 /* ===========================
    BUTTONS
    =========================== */
