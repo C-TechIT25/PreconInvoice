@@ -215,14 +215,28 @@ function render() {
   recalc();
 }
 
+function isDiscountEnabled() {
+  var selected = document.querySelector('input[name="discountToggle"]:checked');
+  return !selected || selected.value === 'show';
+}
+
+function setDiscountEnabled(enabled) {
+  document.querySelectorAll('input[name="discountToggle"]').forEach(function (radio) {
+    radio.checked = (radio.value === (enabled ? 'show' : 'hide'));
+  });
+}
+
 function recalc() {
   var sub = 0;
   items.forEach(function (it) { sub += it.qty * it.price; });
-  var disc = parseFloat(document.getElementById('discountRate').value) || 0;
+  var discountEnabled = isDiscountEnabled();
+  var disc = discountEnabled ? (parseFloat(document.getElementById('discountRate').value) || 0) : 0;
   var sg = parseFloat(document.getElementById('sgstRate').value) || 0;
   var cg = parseFloat(document.getElementById('cgstRate').value) || 0;
   var discAmt = sub * disc / 100;
   var afterDisc = sub - discAmt;
+  var discountRow = document.getElementById('discountRow');
+  if (discountRow) discountRow.style.display = discountEnabled ? '' : 'none';
   document.getElementById('subTotal').innerHTML = '₹ ' + fmt(sub);
   document.getElementById('discountAmt').innerHTML = '− ₹ ' + fmt(discAmt);
   document.getElementById('sgstAmt').innerHTML = '₹ ' + fmt(afterDisc * sg / 100);
@@ -436,12 +450,14 @@ function getHeaderHtml() {
 function getFooterHtml() {
   var sub = 0;
   items.forEach(function (it) { sub += it.qty * it.price; });
-  var disc = parseFloat(document.getElementById('discountRate').value) || 0;
+  var discountEnabled = isDiscountEnabled();
+  var disc = discountEnabled ? (parseFloat(document.getElementById('discountRate').value) || 0) : 0;
   var sg = parseFloat(document.getElementById('sgstRate').value) || 0;
   var cg = parseFloat(document.getElementById('cgstRate').value) || 0;
   var discAmt = sub * disc / 100;
   var afterDisc = sub - discAmt;
   var grand = afterDisc + afterDisc * sg / 100 + afterDisc * cg / 100;
+  var discountRowHtml = discountEnabled ? '<tr class="discount-row"><td>Discount @ ' + disc + '%</td><td>− ₹ ' + fmt(discAmt) + '</td></tr>' : '';
   return '<div class="footer-three-col">' +
     '<div class="footer-bank"><span class="blabel">🏦 Bank Details</span>' +
     '<table class="btable">' + document.querySelector('.footer-bank .btable').innerHTML + '</table></div>' +
@@ -449,7 +465,7 @@ function getFooterHtml() {
     buildTermItemsHtml(getInvoiceTerms(), false) + '</div>' +
     '<div class="footer-totals"><table class="totals">' +
     '<tr class="subtotal-row"><td>Sub Total</td><td>₹ ' + fmt(sub) + '</td></tr>' +
-    '<tr class="discount-row"><td>Discount @ ' + disc + '%</td><td>− ₹ ' + fmt(discAmt) + '</td></tr>' +
+    discountRowHtml +
     '<tr><td>SGST @ ' + sg + '%</td><td>₹ ' + fmt(afterDisc * sg / 100) + '</td></tr>' +
     '<tr><td>CGST @ ' + cg + '%</td><td>₹ ' + fmt(afterDisc * cg / 100) + '</td></tr>' +
     '<tr class="total-final-row"><td style="width:44%;text-align:left;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">Grand Total</td><td style="width:56%;text-align:right;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">₹ ' + fmt(grand) + '</td></tr>' +
@@ -498,7 +514,9 @@ function printMultiPageInvoice() {
 function collectData() {
   var sub = 0;
   items.forEach(function (it) { sub += it.qty * it.price; });
-  var disc = parseFloat(document.getElementById('discountRate').value) || 0;
+  var discountEnabled = isDiscountEnabled();
+  var discountRate = parseFloat(document.getElementById('discountRate').value) || 0;
+  var disc = discountEnabled ? discountRate : 0;
   var sg = parseFloat(document.getElementById('sgstRate').value) || 0;
   var cg = parseFloat(document.getElementById('cgstRate').value) || 0;
   var discAmt = sub * disc / 100;
@@ -523,7 +541,8 @@ function collectData() {
       return { name: it.name, specs: it.specs, qty: it.qty, unit: it.unit, price: it.price, amount: it.qty * it.price };
     }),
     terms: getInvoiceTerms(),
-    discountRate: disc, discountAmt: discAmt,
+    discountEnabled: discountEnabled,
+    discountRate: discountRate, discountAmt: discAmt,
     sgstRate: sg, cgstRate: cg,
     subTotal: sub,
     sgstAmt: afterDisc * sg / 100,
@@ -607,6 +626,7 @@ function loadInvoiceIntoCreatePage(id, d) {
   setEditableText('shipAddr', d.shipTo && d.shipTo.address);
   setEditableText('shipPhone', d.shipTo && d.shipTo.phone);
 
+  setDiscountEnabled(d.discountEnabled !== false);
   document.getElementById('discountRate').value = d.discountRate || 0;
   setSelectValue('sgstRate', d.sgstRate);
   setSelectValue('cgstRate', d.cgstRate);
@@ -752,6 +772,8 @@ function buildDetailHtml(d) {
   var discountRate = parseFloat(d.discountRate) || 0;
   var discountAmt = parseFloat(d.discountAmt);
   if (isNaN(discountAmt)) discountAmt = (parseFloat(d.subTotal) || 0) * discountRate / 100;
+  var discountEnabled = d.discountEnabled !== false;
+  var discountDetailHtml = discountEnabled ? '<div class="detail-row"><span class="dlabel">Discount (' + discountRate + '%)</span><span class="dval">− ₹ ' + fmt(discountAmt) + '</span></div>' : '';
 
   // Summary cards
   var cards = '<div class="detail-grid">' +
@@ -778,7 +800,7 @@ function buildDetailHtml(d) {
     '<div class="detail-card">' +
     '<div class="detail-card-title">💰 Financials</div>' +
     '<div class="detail-row"><span class="dlabel">Sub Total</span><span class="dval">₹ ' + fmt(d.subTotal) + '</span></div>' +
-    '<div class="detail-row"><span class="dlabel">Discount (' + discountRate + '%)</span><span class="dval">− ₹ ' + fmt(discountAmt) + '</span></div>' +
+    discountDetailHtml +
     '<div class="detail-row"><span class="dlabel">SGST (' + d.sgstRate + '%)</span><span class="dval">₹ ' + fmt(d.sgstAmt) + '</span></div>' +
     '<div class="detail-row"><span class="dlabel">CGST (' + d.cgstRate + '%)</span><span class="dval">₹ ' + fmt(d.cgstAmt) + '</span></div>' +
     '<div class="detail-row" style="background:#fff5f5;border-radius:8px;padding:8px 10px;margin-top:4px"><span class="dlabel" style="color:#d93a39;font-weight:700">Grand Total</span><span class="dval" style="color:#d93a39;font-size:16px">₹ ' + fmt(d.grandTotal) + '</span></div>' +
@@ -1024,6 +1046,8 @@ function renderStaticInvoice(d) {
   var discountRate = parseFloat(d.discountRate) || 0;
   var discountAmt = parseFloat(d.discountAmt);
   if (isNaN(discountAmt)) discountAmt = (parseFloat(d.subTotal) || 0) * discountRate / 100;
+  var discountEnabled = d.discountEnabled !== false;
+  var discountRowHtml = discountEnabled ? '<tr class="discount-row"><td>Discount @ ' + discountRate + '%</td><td>− ₹ ' + fmt(discountAmt) + '</td></tr>' : '';
 
   return '<div class="title-bar"><h1>QUOTATION</h1><span class="orig-copy">Original Copy</span></div>' +
     '<div class="header-grid">' +
@@ -1043,7 +1067,7 @@ function renderStaticInvoice(d) {
     '<div class="footer-terms"><span class="blabel">Terms &amp; Conditions</span>' + buildTermItemsHtml(d.terms || DEFAULT_TERMS, false) + '</div>' +
     '<div class="footer-totals"><table class="totals">' +
     '<tr class="subtotal-row"><td>Sub Total</td><td>₹ ' + fmt(d.subTotal) + '</td></tr>' +
-    '<tr class="discount-row"><td>Discount @ ' + discountRate + '%</td><td>− ₹ ' + fmt(discountAmt) + '</td></tr>' +
+    discountRowHtml +
     '<tr><td>SGST @ ' + d.sgstRate + '%</td><td>₹ ' + fmt(d.sgstAmt) + '</td></tr>' +
     '<tr><td>CGST @ ' + d.cgstRate + '%</td><td>₹ ' + fmt(d.cgstAmt) + '</td></tr>' +
     '<tr class="total-final-row"><td style="width:44%;text-align:left;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">Grand Total</td><td style="width:56%;text-align:right;font-size:16px!important;font-weight:900!important;line-height:1.15;white-space:nowrap">₹ ' + fmt(d.grandTotal) + '</td></tr>' +
