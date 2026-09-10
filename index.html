@@ -83,6 +83,10 @@
     <div id="createPage" class="page-section">
       <div class="toolbar">
         <div class="tb-brand" id="toolbarTitle">🏗️ PRECON — Proforma Invoice</div>
+        <div class="discount-toggle" role="radiogroup" aria-label="Discount display">
+          <label><input type="radio" name="discountToggle" value="show" checked onchange="recalc()"> Show Discount</label>
+          <label><input type="radio" name="discountToggle" value="hide" onchange="recalc()"> No Discount</label>
+        </div>
         <button class="btn btn-green" id="saveBtn" onclick="saveToFirestore()">💾 Save to Firestore</button>
         <button class="btn btn-ghost-dark" id="cancelEditBtn" onclick="cancelEditMode()" style="display:none">Cancel Edit</button>
         <button class="btn btn-red" onclick="printMultiPageInvoice()">🖨️ Print / PDF</button>
@@ -222,7 +226,7 @@
                 <td>Sub Total</td>
                 <td id="subTotal">₹ 0.00</td>
               </tr>
-              <tr class="discount-row">
+              <tr class="discount-row" id="discountRow">
                 <td>Discount @ <input type="number" class="discount-input" id="discountRate" value="0" min="0" max="100"
                     step="1" oninput="recalc()">%</td>
                 <td id="discountAmt">− ₹ 0.00</td>
